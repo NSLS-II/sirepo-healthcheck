@@ -1,6 +1,6 @@
 import re
 import smtplib
-from email.mime.text import MIMEText
+from email.message import EmailMessage
 
 import requests
 
@@ -24,16 +24,18 @@ def health_check(server=None, timeout=30.0):
 
 
 def send_status_email(server, status, addressees):
-    msg = MIMEText(f'{server}: {status}')
+    subject = f'Sirepo status at {server}'
+    content = f'{server}: {status}'
+    sender = 'Sirepo Health Check <sirepo@cpu-001>'
 
-    sender = 'Sirepo Health Check'
-    # you == the recipient's email address
-    msg['Subject'] = f'Sirepo status at {server}'
+    msg = EmailMessage()
+    msg.set_content(content)
+    msg['Subject'] = subject
     msg['From'] = sender
     msg['To'] = addressees
 
-    s = smtplib.SMTP('127.0.0.1')
-    s.sendmail(sender, addressees, msg.as_string())
+    s = smtplib.SMTP('localhost')
+    s.send_message(msg)
     s.quit()
 
 
@@ -41,7 +43,7 @@ if __name__ == '__main__':
     servers = [
         'https://expdev.nsls2.bnl.gov/light',
         'https://google.com',
-        'http://nsls2expdev1:8000/light',
+        'http://nsls2expdev1.bnl.gov:8000/light',
     ]
     addressees = [
         'mrakitin@bnl.gov',
