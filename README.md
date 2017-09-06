@@ -1,3 +1,5 @@
+# Sirepo Health Check
+
 This is Sirepo health check utility. It checks the availability of the light page of the specified servers (currently 2 local NSLS-II servers and RadiaSoft's alpha/beta servers. It creates a `.json` status file (stored in `/tmp`, via a crontab job, see the [crontab](crontab) file for details). On the first start the utility checks the current statuses of the machines and sends a notification to the specified addresses like:
 
 ```
