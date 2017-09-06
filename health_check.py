@@ -71,8 +71,8 @@ if __name__ == '__main__':
         'https://expdev.nsls2.bnl.gov/light',
         # 'https://google.com',
         'http://nsls2expdev1.bnl.gov:8000/light',
-        'http://localhost:8000/light',
-        'http://127.0.0.1:8000/light',
+        # 'http://localhost:8000/light',
+        # 'http://127.0.0.1:8000/light',
     ]
     addressees = [
         'mrakitin@bnl.gov',
