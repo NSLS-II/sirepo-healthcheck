@@ -1,5 +1,8 @@
 SHELL=/bin/bash
-PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
+HOME=/home/mrakitin
+PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin:$HOME/miniconda3/bin/
+http_proxy="http://proxy:8888"
+https_proxy="http://proxy:8888"
 
-*/1 * * * * mrakitin ( cd /tmp && /home/mrakitin/miniconda3/bin/python health_check.py)
+*/5 8-19 * * 1-5 ( cd /tmp && $HOME/miniconda3/bin/python $HOME/src/mrakitin/sirepo_healthcheck/health_check.py )
 
