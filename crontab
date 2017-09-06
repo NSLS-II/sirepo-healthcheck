@@ -1,0 +1,5 @@
+SHELL=/bin/bash
+PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
+
+*/1 * * * * mrakitin ( cd /tmp && /home/mrakitin/miniconda3/bin/python health_check.py)
+
