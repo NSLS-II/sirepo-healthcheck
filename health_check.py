@@ -69,20 +69,22 @@ def _to_json(d):
 if __name__ == '__main__':
     servers = [
         'https://expdev.nsls2.bnl.gov/light',
-        # 'https://google.com',
         'http://nsls2expdev1.bnl.gov:8000/light',
         # 'http://localhost:8000/light',
         # 'http://127.0.0.1:8000/light',
+        'https://alpha.sirepo.com/light',
+        'https://beta.sirepo.com/light',
     ]
     addressees = [
         'mrakitin@bnl.gov',
         'maxim.rakitin@gmail.com',
     ]
-    test = True
+    # test = True
+    test = False
     # status_file = '/tmp/sirepo_healthcheck.json'
     status_file = 'sirepo_healthcheck.json'
 
-    reminder_period = 2  # min
+    reminder_period = 120  # min
 
     statuses = {}
     datetime_format = '%Y-%m-%d %H:%M:%S'
@@ -95,7 +97,8 @@ if __name__ == '__main__':
             'check_timestamp': timestamp,
             'check_datetime': datetime.datetime.fromtimestamp(timestamp).strftime(datetime_format),
             'last_seen_timestamp': timestamp if status else None,
-            'last_seen_datetime': datetime.datetime.fromtimestamp(timestamp).strftime(datetime_format) if status else None,
+            'last_seen_datetime': datetime.datetime.fromtimestamp(timestamp).strftime(
+                datetime_format) if status else None,
             'last_notified': None,
         }
 
@@ -166,10 +169,13 @@ if __name__ == '__main__':
                             statuses[k]['last_notified'] = time.time()
                         else:
                             statuses[k]['last_notified'] = previous_statuses[k]['last_notified']
-                        if (statuses[k]['check_timestamp'] - statuses[k]['last_notified']) / 60 > reminder_period:  # remind after set minutes
+                        if (statuses[k]['check_timestamp'] - statuses[k][
+                            'last_notified']) / 60 > reminder_period:  # remind after set minutes
                             statuses[k]['last_notified'] = statuses[k]['check_timestamp']
                             subject = 'reminder about down server'
-                            msgs.append(f"{k}: the server is down for more than {reminder_period} minutes")
+                            msgs.append(
+                                f"{k}: the server is down for more than {reminder_period} minutes ({datetime.datetime.fromtimestamp(time.time()).strftime(datetime_format)})")
+
     update_status_file(status_file, statuses)
     if msgs:
         send_status_email(subject, addressees, '\n'.join(msgs), test=test)
