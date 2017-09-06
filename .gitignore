@@ -101,3 +101,6 @@ ENV/
 .mypy_cache/
 
 .idea/
+
+sirepo_healthcheck.json
+
