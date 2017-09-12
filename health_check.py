@@ -72,12 +72,13 @@ if __name__ == '__main__':
         'http://nsls2expdev1.bnl.gov:8000/light',
         # 'http://localhost:8000/light',
         # 'http://127.0.0.1:8000/light',
-        'https://alpha.sirepo.com/light',
-        'https://beta.sirepo.com/light',
+        # 'https://alpha.sirepo.com/light',
+        # 'https://beta.sirepo.com/light',
     ]
     addressees = [
         'mrakitin@bnl.gov',
         'maxim.rakitin@gmail.com',
+        'chubar@bnl.gov',
     ]
     # test = True
     test = False
