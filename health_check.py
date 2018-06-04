@@ -79,6 +79,7 @@ if __name__ == '__main__':
         'mrakitin@bnl.gov',
         'maxim.rakitin@gmail.com',
         'chubar@bnl.gov',
+        'lwiegart@bnl.gov',
     ]
     # test = True
     test = False
