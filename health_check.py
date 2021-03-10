@@ -68,25 +68,30 @@ def _to_json(d):
 
 if __name__ == '__main__':
     servers = [
-        'https://expdev.nsls2.bnl.gov/light',
-        'http://nsls2expdev1.bnl.gov:8000/light',
+        'https://expdev-test.nsls2.bnl.gov/srw#/simulations',
+        'https://expdev.nsls2.bnl.gov/srw#/simulations',
+        #'https://expdev.nsls2.bnl.gov/light',
+        #'http://nsls2expdev1.bnl.gov:8000/light',
         # 'http://localhost:8000/light',
         # 'http://127.0.0.1:8000/light',
         # 'https://alpha.sirepo.com/light',
         # 'https://beta.sirepo.com/light',
     ]
     addressees = [
-        'mrakitin@bnl.gov',
-        'maxim.rakitin@gmail.com',
-        'chubar@bnl.gov',
-        'lwiegart@bnl.gov',
+        'anhe@bnl.gov',
+        'ahe@bnl.gov',
+        'heananhe@gmail.com',
+        #'mrakitin@bnl.gov',
+        #'maxim.rakitin@gmail.com',
+        #'chubar@bnl.gov',
+        #'lwiegart@bnl.gov',
     ]
     # test = True
     test = False
     # status_file = '/tmp/sirepo_healthcheck.json'
     status_file = 'sirepo_healthcheck.json'
 
-    reminder_period = 120  # min
+    reminder_period = 0.01#120  # min
 
     statuses = {}
     datetime_format = '%Y-%m-%d %H:%M:%S'
