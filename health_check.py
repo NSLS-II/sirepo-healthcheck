@@ -3,6 +3,7 @@ import json
 import os
 import re
 import smtplib
+import socket
 import time
 from email.message import EmailMessage
 
@@ -27,13 +28,19 @@ def health_check(server=None, timeout=10.0):
     except requests.exceptions.ConnectionError:
         return False
 
+    if r.status_code != 200:
+        print(f'The return code is {r.status_code}. '
+              f'Something is wrong with {server}.')
+        return False
+
     return True if re.search('APP_VERSION', r.text) else False
 
 
 def send_status_email(subject, addressees, body, test=True):
     subject = f'Sirepo: {subject}'
     content = body
-    sender = 'Sirepo Health Check <sirepo@cpu-001>'
+    server_name = socket.gethostname()
+    sender = f'Sirepo Health Check <sirepo@{server_name}>'
     msg = EmailMessage()
     msg.set_content(content)
     msg['Subject'] = subject
@@ -66,7 +73,7 @@ def _to_json(d):
     return json.dumps(statuses, sort_keys=True, indent=4, separators=(',', ': '))
 
 
-if __name__ == '__main__':
+def main(test=True):
     servers = [
         'https://expdev-test.nsls2.bnl.gov/srw#/simulations',
         'https://expdev.nsls2.bnl.gov/srw#/simulations',
@@ -86,12 +93,10 @@ if __name__ == '__main__':
         #'chubar@bnl.gov',
         #'lwiegart@bnl.gov',
     ]
-    # test = True
-    test = False
     # status_file = '/tmp/sirepo_healthcheck.json'
     status_file = 'sirepo_healthcheck.json'
 
-    reminder_period = 0.01#120  # min
+    reminder_period = 120  # min
 
     statuses = {}
     datetime_format = '%Y-%m-%d %H:%M:%S'
@@ -186,3 +191,7 @@ if __name__ == '__main__':
     update_status_file(status_file, statuses)
     if msgs:
         send_status_email(subject, addressees, '\n'.join(msgs), test=test)
+
+
+if __name__ == '__main__':
+    main(test=False)
