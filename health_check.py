@@ -69,7 +69,7 @@ def _from_json_file(file):
         return _from_json(f.read())
 
 
-def _to_json(d):
+def _to_json(statuses):
     return json.dumps(statuses, sort_keys=True, indent=4, separators=(',', ': '))
 
 
