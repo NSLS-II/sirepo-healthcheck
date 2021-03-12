@@ -1,8 +1,7 @@
 SHELL=/bin/bash
 HOME=/home/pi
 PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
-# http_proxy="http://proxy:8888"
-# https_proxy="http://proxy:8888"
+# SLACK_WEBHOOK_URL="<Add Slack webhook URL here>"
 
-*/5 8-19 * * 1-5 ( . $HOME/.bashrc && cd /tmp && $HOME/.conda/envs/sirepo-healthcheck/bin/python $HOME/src/sirepo-healthcheck/health_check.py )
+*/5 8-19 * * 1-5 ( cd /tmp && $HOME/.conda/envs/sirepo-healthcheck/bin/python $HOME/src/sirepo-healthcheck/health_check.py )
 
