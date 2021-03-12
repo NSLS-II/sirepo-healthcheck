@@ -6,6 +6,7 @@ import smtplib
 import socket
 import time
 from email.message import EmailMessage
+from slack_sdk.webhook import WebhookClient
 
 import requests
 
@@ -13,9 +14,16 @@ import requests
 def health_check(server=None, timeout=10.0):
     """Sirepo health check function.
 
-    :param server: a server to check.
-    :param timeout: timeout for the request.
-    :return: boolean value showing if the server is up.
+    Parameters
+    ----------
+    server : str
+        a server to check.
+    timeout : float (optional)
+        timeout for the request.
+
+    Returns
+    -------
+    boolean value showing if the server is up.
     """
     try:
         r = requests.get(
@@ -37,6 +45,19 @@ def health_check(server=None, timeout=10.0):
 
 
 def send_status_email(subject, addressees, body, test=True):
+    """Send a status email.
+
+    Parameters
+    ----------
+    subject : str
+        a subject string for the email.
+    addressees : list
+        a list of email addresses to send to.
+    body : str
+        a text body for the email.
+    test : bool
+        a flag for test mode (True by default).
+    """
     subject = f'Sirepo: {subject}'
     content = body
     server_name = socket.gethostname()
@@ -53,6 +74,45 @@ def send_status_email(subject, addressees, body, test=True):
         s = smtplib.SMTP('localhost')
         s.send_message(msg)
         s.quit()
+
+
+def post_slack_message(subject, body, test=False):
+    """Post a status message to Slack.
+
+    Parameters
+    ----------
+    subject : str
+        a subject string to post.
+    body : str
+        a text body to post.
+    test : bool
+        a flag for test mode (False by default).
+    """
+
+    url = os.getenv('SLACK_WEBHOOK_URL')
+    webhook = WebhookClient(url)
+
+    subject = f'Sirepo: {subject}'
+    content = body
+    server_name = socket.gethostname()
+    sender = f'Sirepo Health Check <sirepo@{server_name}>'
+
+    if test:
+        print(body)
+    else:
+        response = webhook.send(
+            text="fallback",
+            blocks=[
+                {
+                    "type": "section",
+                    "text": {
+                        "type": "mrkdwn",
+                        "text": f'# {subject}\n## {sender}:\n{content}'
+                    }
+                }
+            ]
+        )
+        print(response)
 
 
 def update_status_file(status_file, statuses):
@@ -85,18 +145,10 @@ def main(test=True):
         # 'https://beta.sirepo.com/light',
     ]
     addressees = [
-        'anhe@bnl.gov',
-        'ahe@bnl.gov',
-        'heananhe@gmail.com',
-        #'mrakitin@bnl.gov',
-        #'maxim.rakitin@gmail.com',
-        #'chubar@bnl.gov',
-        #'lwiegart@bnl.gov',
     ]
-    # status_file = '/tmp/sirepo_healthcheck.json'
     status_file = 'sirepo_healthcheck.json'
 
-    reminder_period = 120  # min
+    reminder_period = 0.01  # min
 
     statuses = {}
     datetime_format = '%Y-%m-%d %H:%M:%S'
@@ -190,7 +242,8 @@ def main(test=True):
 
     update_status_file(status_file, statuses)
     if msgs:
-        send_status_email(subject, addressees, '\n'.join(msgs), test=test)
+        # send_status_email(subject, addressees, '\n'.join(msgs), test=test)
+        post_slack_message(subject, '\n'.join(msgs), test=test)
 
 
 if __name__ == '__main__':
