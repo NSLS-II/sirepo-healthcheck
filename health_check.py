@@ -91,13 +91,14 @@ def post_slack_message(subject, body, test=False):
         a flag for test mode (False by default).
     """
 
-    url = os.getenv("SLACK_WEBHOOK_URL")
+    url = os.getenv("SLACK_WEBHOOK_URL", None)
+    if url is None:
+        raise RuntimeError('Define "SLACK_WEBHOOK_URL" env var!')
     webhook = WebhookClient(url)
 
-    subject = f"Sirepo: {subject}"
-    content = body
     server_name = socket.gethostname()
-    sender = f"Sirepo Health Check <sirepo@{server_name}>"
+    subject = f"Sirepo monitoring @ {server_name}: {subject}"
+    content = body
 
     if test:
         print(body)
@@ -109,7 +110,7 @@ def post_slack_message(subject, body, test=False):
                     "type": "section",
                     "text": {
                         "type": "mrkdwn",
-                        "text": f"# {subject}\n## {sender}:\n{content}",
+                        "text": f"*{subject}*\n\n```{content}```",
                     },
                 }
             ],
