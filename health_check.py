@@ -151,7 +151,7 @@ def main(test=True):
     # addressees = []
     status_file = "sirepo_healthcheck.json"
 
-    reminder_period = 0.01  # min
+    reminder_period = 120  # min
 
     statuses = {}
     datetime_format = "%Y-%m-%d %H:%M:%S"
