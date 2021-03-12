@@ -78,7 +78,7 @@ def send_status_email(subject, addressees, body, test=True):
         s.quit()
 
 
-def post_slack_message(subject, body, test=False):
+def post_slack_message(subject, content, test=False):
     """Post a status message to Slack.
 
     Parameters
@@ -98,10 +98,9 @@ def post_slack_message(subject, body, test=False):
 
     server_name = socket.gethostname()
     subject = f"Sirepo monitoring @ {server_name}: {subject}"
-    content = body
 
     if test:
-        print(body)
+        print(content)
     else:
         response = webhook.send(
             text="fallback",
@@ -110,7 +109,7 @@ def post_slack_message(subject, body, test=False):
                     "type": "section",
                     "text": {
                         "type": "mrkdwn",
-                        "text": f"*{subject}*\n\n```{content}```",
+                        "text": f"*{subject}*\n\n{content}",
                     },
                 }
             ],
