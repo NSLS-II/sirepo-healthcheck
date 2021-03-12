@@ -6,9 +6,9 @@ import smtplib
 import socket
 import time
 from email.message import EmailMessage
-from slack_sdk.webhook import WebhookClient
 
 import requests
+from slack_sdk.webhook import WebhookClient
 
 
 def health_check(server=None, timeout=10.0):
