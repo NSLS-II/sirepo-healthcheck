@@ -1,14 +1,19 @@
 import datetime
+import glob
 import json
 import os
 import re
+import shutil
 import smtplib
 import socket
 import time
+from argparse import Namespace
 from email.message import EmailMessage
 
 import requests
+from slack_sdk import WebClient
 from slack_sdk.webhook import WebhookClient
+from webscreenshot.webscreenshot import take_screenshot
 
 
 def health_check(server=None, timeout=10.0):
@@ -117,9 +122,68 @@ def post_slack_message(subject, content, test=False):
         return response
 
 
+def get_screenshots(url_list, output_dir):
+
+    shutil.rmtree(output_dir, ignore_errors=True)
+
+    options = Namespace(
+        URL=None,
+        ajax_max_timeouts="5000,10000",
+        cookie=None,
+        crop=None,
+        custom_js=None,
+        format="png",
+        header=None,
+        http_password=None,
+        http_username=None,
+        imagemagick_binary=None,
+        input_file=None,
+        label=False,
+        label_bg_color="NavajoWhite",
+        label_size=60,
+        log_level="DEBUG",
+        multiprotocol=False,
+        no_error_file=False,
+        no_xserver=True,
+        output_directory=output_dir,
+        port=None,
+        proxy=None,
+        proxy_auth=None,
+        proxy_type=None,
+        quality=75,
+        renderer="phantomjs",
+        renderer_binary=None,
+        single_output_file=None,
+        ssl=False,
+        timeout="60",
+        verbosity=2,
+        window_size="1200,800",
+        workers=4,
+    )
+
+    take_screenshot(url_list=url_list, options=options)
+
+
+def upload_files_to_slack(files):
+    slack_token = os.environ["SLACK_BOT_TOKEN"]
+    client = WebClient(token=slack_token)
+    for f in files:
+        basename = os.path.basename(f)
+        resp = client.files_upload(
+            channels=os.environ["SLACK_POSTING_CHANNEL"],
+            file=f,
+            title=f"*{basename}* from '{socket.gethostname()}'",
+        )
+        print(f"Status code for uploading of {basename} is {resp.status_code}")
+
+
 def update_status_file(status_file, statuses):
     with open(status_file, "w") as f:
         f.write(_to_json(statuses))
+
+
+def _cleanup_output_dir(dirname):
+    shutil.rmtree(dirname)
 
 
 def _from_json(s):
@@ -288,6 +352,13 @@ def main(test=True):
     if msgs:
         # send_status_email(subject, addressees, '\n'.join(msgs), test=test)
         post_slack_message(subject, "\n".join(msgs), test=test)
+
+        output_dir = "/tmp/sirepo-healthcheck-screenshots"
+
+        get_screenshots(url_list=servers, output_dir=output_dir)
+
+        files = glob.glob(os.path.join(output_dir, "*.png"))
+        upload_files_to_slack(files)
 
 
 if __name__ == "__main__":
