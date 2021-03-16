@@ -107,14 +107,15 @@ def post_slack_message(subject, content, test=False):
     if test:
         print(content)
     else:
+        text = f"*{subject}*\n\n{content}"
         response = webhook.send(
-            text="fallback",
+            text=text,
             blocks=[
                 {
                     "type": "section",
                     "text": {
                         "type": "mrkdwn",
-                        "text": f"*{subject}*\n\n{content}",
+                        "text": text,
                     },
                 }
             ],
