@@ -2,6 +2,8 @@ SHELL=/bin/bash
 HOME=/home/pi
 PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 # SLACK_WEBHOOK_URL="<Add Slack webhook URL here>"
+# SLACK_BOT_TOKEN="<Add Slack bot token here>"
+# SLACK_POSTING_CHANNEL="<Add Slack posting channel here (starts with C0...)>"
 
 */5 8-19 * * 1-5 ( cd /tmp && $HOME/.conda/envs/sirepo-healthcheck/bin/python $HOME/src/sirepo-healthcheck/health_check.py )
 
