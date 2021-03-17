@@ -2,6 +2,14 @@ SHELL=/bin/bash
 HOME=/home/pi
 PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 # SLACK_WEBHOOK_URL="<Add Slack webhook URL here>"
+# SLACK_BOT_TOKEN="<Add Slack bot token here>"
+# SLACK_POSTING_CHANNEL="<Add Slack posting channel here (starts with C0...)>"
 
-*/5 8-19 * * 1-5 ( cd /tmp && $HOME/.conda/envs/sirepo-healthcheck/bin/python $HOME/src/sirepo-healthcheck/health_check.py )
+# https://crontab.guru/#*/5_8-19_*_*_1-5
+# "At every 5th minute past every hour from 8 through 19 on every day-of-week from Monday through Friday."
+# */5 8-19 * * 1-5 ( cd /tmp && $HOME/.conda/envs/sirepo-healthcheck/bin/python $HOME/src/sirepo-healthcheck/health_check.py )
+
+# https://crontab.guru/#*/5_*_*_*_*
+# "At every 5th minute."
+*/5 * * * * ( cd /tmp && $HOME/.conda/envs/sirepo-healthcheck/bin/python $HOME/src/sirepo-healthcheck/health_check.py )
 
