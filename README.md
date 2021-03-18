@@ -22,3 +22,11 @@ http://nsls2expdev1.bnl.gov:8000/light: status changed: down -> up (2017-09-06 1
 ```
 
 The crontab job runs every 5 minutes on weekdays from 8 am to 7:55 pm. If the machine is not restored, a reminder email will be sent in 2 hours after the last notification.
+
+## Reproducibility
+
+Run it in one line:
+
+```bash
+$ docker run -it --rm -e SLACK_WEBHOOK_URL -e SLACK_BOT_TOKEN -e SLACK_POSTING_CHANNEL nsls2/debian-with-miniconda:v0.1.2 bash -c "conda create -n sirepo-monitoring python=3.9 ipython phantomjs -c conda-forge -y && . /opt/conda/etc/profile.d/conda.sh && conda activate sirepo-monitoring && git clone https://github.com/NSLS-II/sirepo-healthcheck && cd sirepo-healthcheck/ && pip install -r requirements.txt && pip install -r requirements-dev.txt &&  python -VV && python health_check.py"
+```
