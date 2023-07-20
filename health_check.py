@@ -41,7 +41,7 @@ def health_check(server=None, timeout=10.0):
     except requests.exceptions.ConnectionError:
         return False
 
-    if r.status_code != 200:
+    if r.status_code not in [200, 302]:
         print(
             f"The return code is {r.status_code}. "
             f"Something is wrong with {server}."
@@ -204,8 +204,10 @@ def _to_json(statuses):
 
 def main(test=True):
     servers = [
-        "https://expdev-test.nsls2.bnl.gov/srw#/simulations",
-        "https://expdev.nsls2.bnl.gov/srw#/simulations",
+        "https://raydata.nsls2.bnl.gov/raydata/",
+        "http://127.0.0.1:8081/raydata",
+        # "https://expdev-test.nsls2.bnl.gov/srw#/simulations",
+        # "https://expdev.nsls2.bnl.gov/srw#/simulations",
         # 'https://expdev.nsls2.bnl.gov/light',
         # 'http://nsls2expdev1.bnl.gov:8000/light',
         # 'http://localhost:8000/light',
