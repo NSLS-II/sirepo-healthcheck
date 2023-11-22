@@ -11,6 +11,7 @@ import datetime
 import os
 import re
 from playwright.async_api import async_playwright, expect
+from pathlib import Path
 
 BASE_URL = "http://127.0.0.1:8081/raydata"
 
@@ -57,7 +58,7 @@ if __name__ == "__main__":
 
     import argparse
     parser = argparse.ArgumentParser()
-    parser.add_argument("OUTPUT_DIR")
+    parser.add_argument("-o", "--output-dir", type=Path, default=".", help="Path to save screenshots", dest="OUTPUT_DIR")
     args = parser.parse_args()
     asyncio.run(generate_screenshots(args.OUTPUT_DIR))
 
