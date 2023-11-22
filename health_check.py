@@ -131,7 +131,7 @@ def get_screenshots(url_list, output_dir):
     timestamp = datetime.datetime.now().strftime('%Y-%m-%dT%H.%M.%S')
     path = Path(output_dir) / timestamp
     path.mkdir(parents=True)
-    coro = playwright_workflow.main(path)
+    coro = playwright_workflow.generate_screenshots(path)
     asyncio.run(coro)
     return path
 
