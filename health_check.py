@@ -7,13 +7,16 @@ import shutil
 import smtplib
 import socket
 import time
+import asyncio
 from argparse import Namespace
 from email.message import EmailMessage
+from pathlib import Path
 
 import requests
 from slack_sdk import WebClient
 from slack_sdk.webhook import WebhookClient
-from webscreenshot.webscreenshot import take_screenshot
+
+import playwright_workflow
 
 
 def health_check(server=None, timeout=10.0):
@@ -41,7 +44,7 @@ def health_check(server=None, timeout=10.0):
     except requests.exceptions.ConnectionError:
         return False
 
-    if r.status_code != 200:
+    if r.status_code not in [200, 302]:
         print(
             f"The return code is {r.status_code}. "
             f"Something is wrong with {server}."
@@ -125,44 +128,12 @@ def post_slack_message(subject, content, test=False):
 
 def get_screenshots(url_list, output_dir):
 
-    shutil.rmtree(output_dir, ignore_errors=True)
-
-    options = Namespace(
-        URL=None,
-        ajax_max_timeouts="5000,10000",
-        cookie=None,
-        crop=None,
-        custom_js=None,
-        format="png",
-        header=None,
-        http_password=None,
-        http_username=None,
-        imagemagick_binary=None,
-        input_file=None,
-        label=False,
-        label_bg_color="NavajoWhite",
-        label_size=60,
-        log_level="DEBUG",
-        multiprotocol=False,
-        no_error_file=False,
-        no_xserver=True,
-        output_directory=output_dir,
-        port=None,
-        proxy=None,
-        proxy_auth=None,
-        proxy_type=None,
-        quality=75,
-        renderer="phantomjs",
-        renderer_binary=None,
-        single_output_file=None,
-        ssl=False,
-        timeout="60",
-        verbosity=2,
-        window_size="1200,800",
-        workers=4,
-    )
-
-    take_screenshot(url_list=url_list, options=options)
+    timestamp = datetime.datetime.now().strftime('%Y-%m-%dT%H.%M.%S')
+    path = Path(output_dir) / timestamp
+    path.mkdir(parents=True)
+    coro = playwright_workflow.generate_screenshots(path)
+    asyncio.run(coro)
+    return path
 
 
 def upload_files_to_slack(files):
@@ -204,8 +175,10 @@ def _to_json(statuses):
 
 def main(test=True):
     servers = [
-        "https://expdev-test.nsls2.bnl.gov/srw#/simulations",
-        "https://expdev.nsls2.bnl.gov/srw#/simulations",
+        # "https://raydata.nsls2.bnl.gov/raydata/",
+        "http://127.0.0.1:8081/raydata",
+        # "https://expdev-test.nsls2.bnl.gov/srw#/simulations",
+        # "https://expdev.nsls2.bnl.gov/srw#/simulations",
         # 'https://expdev.nsls2.bnl.gov/light',
         # 'http://nsls2expdev1.bnl.gov:8000/light',
         # 'http://localhost:8000/light',
@@ -354,11 +327,11 @@ def main(test=True):
         # send_status_email(subject, addressees, '\n'.join(msgs), test=test)
         post_slack_message(subject, "\n".join(msgs), test=test)
 
-        output_dir = "/tmp/sirepo-healthcheck-screenshots"
+        output_dir = "/tmp/hw-sirepo-healthcheck-screenshots"
 
-        get_screenshots(url_list=servers, output_dir=output_dir)
+        output_subdir = get_screenshots(url_list=servers, output_dir=output_dir)
 
-        files = glob.glob(os.path.join(output_dir, "*.png"))
+        files = glob.glob(os.path.join(output_subdir, "*.png"))
         upload_files_to_slack(files)
 
 
